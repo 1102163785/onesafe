@@ -37,7 +37,8 @@ scramblesuit 是一种安全性稍高的加密工作方式，该方式工作时�
 nano /etc/rc.local 
 
 ```
-add blew context
+Add the following content to /etc/rc.local 
+
 (/usr/local/bin/obfsproxy --data-dir=/tmp/scramblesuit-server scramblesuit --password=FANGBINXINGFUCKYOURMOTHERSASS444 --dest=127.0.0.1:25 server 0.0.0.0:23333 >/dev/null 2>&1 &)
 
 ```
