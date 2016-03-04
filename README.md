@@ -1,12 +1,11 @@
 ## 最新版obfs4 V1.0.0.0##
 
-
-* SquidProxy [下载](https://github.com/squidproxy/squidproxy/releases/download/V2.0.0.13/Squidproxy.exe)
+即将发布
 
 ##特性##
 
 - 支持Squid技术
-- 客户端使用obfs4混淆
+- 客户端使用obfs4混淆加密
 - 基于Framework3.5框架开发
 - 支持智能和全局!
 
