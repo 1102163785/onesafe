@@ -1,0 +1,9 @@
+C:\Users\maplebanana\Desktop\obfs4\obfsproxy\obfsproxy\obj\Debug\obfsproxy.Form1.resources
+C:\Users\maplebanana\Desktop\obfs4\obfsproxy\obfsproxy\obj\Debug\obfsproxy1.csproj.GenerateResource.Cache
+C:\Users\maplebanana\Desktop\obfs4\obfsproxy\obfsproxy\obj\Debug\obfsproxy1.csprojResolveAssemblyReference.cache
+C:\Users\maplebanana\Desktop\obfs4\obfsproxy\obfsproxy\bin\Debug\obfsproxy1.exe.config
+C:\Users\maplebanana\Desktop\obfs4\obfsproxy\obfsproxy\bin\Debug\obfsproxy1.exe
+C:\Users\maplebanana\Desktop\obfs4\obfsproxy\obfsproxy\bin\Debug\obfsproxy1.pdb
+C:\Users\maplebanana\Desktop\obfs4\obfsproxy\obfsproxy\obj\Debug\obfsproxy1.Properties.Resources.resources
+C:\Users\maplebanana\Desktop\obfs4\obfsproxy\obfsproxy\obj\Debug\obfsproxy1.exe
+C:\Users\maplebanana\Desktop\obfs4\obfsproxy\obfsproxy\obj\Debug\obfsproxy1.pdb
