@@ -1,8 +1,8 @@
 
-## obfsproxy 1.0.0.1##
+## OneSafe 1.0.0.1##
 
 
-* obfsproxy  [下载](https://github.com/squidproxy/obfs4/releases/download/v1.0.0.1/obfsproxydl.exe)
+* OneSafe [下载](https://github.com/squidproxy/obfs4/releases/download/v1.0.0.1/obfsproxydl.exe)
 
 ##特性##
 
@@ -15,7 +15,7 @@
 
 
 客户端功能介绍:
-obfsproxy鱿鱼版既可以作为obfsproxy客户端使用,也可以配合finalspeed对其流量做二次加密!
+OneSafe 既可以作为obfsproxy客户端使用,也可以配合SS、finalspeed、squidproxy等技术完成更安全的加密!
 
 ##使用说明##
 
@@ -35,8 +35,10 @@ obfsproxy鱿鱼版既可以作为obfsproxy客户端使用,也可以配合finalsp
 显示监听成!如果监听失败,确保obfsproxy解压在一个英文路径的目录不留空格!中文会遇到问题!后续会解决这个bug!﻿
 
 ```
+##使用说明##
 
-##obfsproxy介绍##
+
+##OneSafe使用的技术介绍##
 
 obfsproxy 可以对任意的流量做混淆处理,比如SS、squid、Openvpn等产生的流量
 obfsproxy is a tool that attempts to circumvent censorship, by transforming the Tor traffic between the client and the bridge. 
@@ -84,7 +86,7 @@ Add the following content to /etc/rc.local
 
 ### 客户端使用说明###
 
-* 直接使用我们设计的obfsproxy客户端,他集成了设置和启动、代理等功能一体,让整个obfsproxy 更简单上手.
+* 直接使用我们设计的OneSafe 客户端,他集成了设置和启动、代理等功能一体,让整个obfsproxy 更简单上手.
 * V1.0.0.1 [下载](https://github.com/squidproxy/obfs4/releases/download/v1.0.0.1/obfsproxydl.exe)
 
 - BASE32  scramblesuit 是一种安全性稍高的加密工作方式, scramblesuit 通过自定义的 BASE32字符串混淆流量,因为BASE32 是用户可以自定义的
