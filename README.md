@@ -1,15 +1,15 @@
 
-## OneSafe 1.0.0.1##
+## OneSafe 1.2##
 
 
 * OneSafe [下载](https://github.com/squidproxy/obfs4/releases/download/v1.0.0.1/obfsproxydl.exe)
 
 ##特性##
 
-- obfsproxy套件
-- 支持启动和配置obfsproxy
-- 全局代理
-- 完美兼容finalspped、Squid
+- 核心套件obfsproxy
+- 多线程监视端口
+- 本地端口监听失败重启功能,确保稳定
+- 支持squid服务器添加启动
 - 可以解决finalspeed断流的问题,提高服务器流量传输的稳定性和安全
 - 基于Framework3.5框架开发
 
@@ -87,7 +87,7 @@ Add the following content to /etc/rc.local
 ### 客户端使用说明###
 
 * 直接使用我们设计的OneSafe 客户端,他集成了设置和启动、代理等功能一体,让整个obfsproxy 更简单上手.
-* V1.0.0.1 [下载](https://github.com/squidproxy/obfs4/releases/download/v1.0.0.1/obfsproxydl.exe)
+* V1.2[下载](https://github.com/squidproxy/obfs4/releases/download/v1.0.0.1/obfsproxydl.exe)
 
 - BASE32  scramblesuit 是一种安全性稍高的加密工作方式, scramblesuit 通过自定义的 BASE32字符串混淆流量,因为BASE32 是用户可以自定义的
 这使得第三方很难模拟obfsproxy客户端!
