@@ -28,7 +28,7 @@ obfsproxy is a tool that attempts to circumvent censorship, by transforming the 
 This way, censors, who usually monitor traffic between the client and the bridge,
  will see innocent-looking transformed traffic instead of the actual Tor traffic.
 
-
+```
 
 ## Server
 
