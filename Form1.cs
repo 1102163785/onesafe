@@ -1,189 +1,214 @@
-﻿using Microsoft.Win32;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
+﻿using System;
 using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
+using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
+using Newtonsoft.Json;
 using System.Windows.Forms;
+using System.IO;
+
+using System.Xml;
+using System.Collections.Generic;
 
 namespace obfsproxy
 {
+
     public partial class Form1 : Form
     {
+
+        private List<Thread> _threadList = new List<Thread>();
+        public static int _contrastupdateStatus;
+
+        public static string versionNum;
+        bool crlapp = true;
+        bool fetchnewsbool = true;
+        private delegate void FlushClient();//代理
+        private delegate void FlushClient1();//代理
+        private System.Timers.Timer timer = new System.Timers.Timer();
+
+        private static bool IsConnectionSuccessful = false;
+        private static Exception socketexception;
+        private static ManualResetEvent TimeoutObject = new ManualResetEvent(false);
+
+
+        delegate void set_Text(string s); //定义委托
+
         public Form1()
         {
+
             InitializeComponent();
 
         }
+
+        [DllImport("kernel32")]
+        private static extern long WritePrivateProfileStringW(string section, string key, string val, string filePath);
+
+
+        [DllImport("kernel32")]
+        private static extern int GetPrivateProfileString(string section, string key, string def, StringBuilder retVal, int size, string filePath);
+
+
+        [DllImport("kernel32")]
+        private static extern int GetPrivateProfileString(string section, string key, string defVal, Byte[] retVal, int size, string filePath);
         [System.Runtime.InteropServices.DllImport("wininet.dll")]
         public static extern bool InternetSetOption(IntPtr hInternet, int dwOption, IntPtr lpBuffer, int dwBufferLength);
         public const int INTERNET_OPTION_SETTINGS_CHANGED = 39;
         public const int INTERNET_OPTION_REFRESH = 37;
         static bool _settingsReturn, _refreshReturn;
-        string globalURL;
         public string inipath;
-        string PacURL;
+        public string path;
+        public string _Base32;
+        public string _obfsproxyadd;
+        public string _obfsproxyport;
+        public string _Localserver;
+        public string _Localport;
+        public string _Squidserveradd;
+        public string _Squidport;
+        string urlink;
+        string newscaption;
+        string _fetchfs;
+
+        /// <summary>
+        /// //毫秒
+        /// </summary>
+        private int ms = 00;
+        /// <summary>
+        /// 秒
+        /// </summary>
+        private int s = 00;
+        /// <summary>
+        /// 分钟
+        /// </summary>
+        private int m = 00;
+        /// <summary>
+        /// 小时
+        /// </summary>
+        private int h = 00;
+        /// <summary>
+        /// 开始计时按钮
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// 
 
 
-        private void smartproxy(string ServerAdress)
+        protected override void WndProc(ref Message m)
         {
-            RegistryKey loca = Registry.CurrentUser;
-            RegistryKey run = loca.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Internet Settings");
-            //  Software\Microsoft\\Windows\CurrentVersion\Internet Settings\Connections",
+            const int WM_SYSCOMMAND = 0x0112;
+            const int SC_CLOSE = 0xF060;
+            if (m.Msg == WM_SYSCOMMAND && (int)m.WParam == SC_CLOSE)
+            { return; }
+            base.WndProc(ref m);
+        }
 
-
-            try
-
-            {
-
-                run.SetValue("ProxyEnable", 0);
-                run.SetValue("ProxyServer", "");
-                run.SetValue("AutoConfigURL", ServerAdress);
-
-                NotifyIE();
-                //Must Notify IE first, or the connections do not chanage
-
-                IEAutoDetectProxy(false);
-                //Must Notify IE first, or the connections do not chanage
-                CopyProxySettingFromLan();
-
-                //Must Notify IE first, or the connections do not chanage
-
-                loca.Close();
-            }
-
-            catch (Exception ee)
-
-            {
-                MessageBox.Show(ee.Message.ToString(), "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+        public class obfsproxyconfig
+        {
+            public string BASE32 { get; set; }
+            public string obfsproxyadd { get; set; }
+            public string obfsproxyport { get; set; }
+            public string Localserver { get; set; }
+            public string Localport { get; set; }
 
         }
-        private void AdslSetSquidProxy(string SquidGobal,string port)
 
+
+        public class data
         {
-            RegistryKey loca = Registry.CurrentUser;
-            RegistryKey run = loca.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Internet Settings");
-            //  Software\Microsoft\\Windows\CurrentVersion\Internet Settings\Connections",
 
-
-            try
-
-            {
-                run.SetValue("ProxyEnable", 1);
-                run.SetValue("ProxyServer", SquidGobal + ":"+port);
-                run.SetValue("AutoConfigURL", "");
-
-                NotifyIE();
-                //Must Notify IE first, or the connections do not chanage
-
-                IEAutoDetectProxy(false);
-                //Must Notify IE first, or the connections do not chanage
-                CopyProxySettingFromLan();
-
-            }
-
-            catch (Exception ee)
-
-            {
-                MessageBox.Show(ee.Message.ToString(), "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-
+            public string BASE32 { get; set; }
+            public string obfsproxyadd { get; set; }
+            public string obfsproxyport { get; set; }
 
 
         }
 
 
-        private static void CopyProxySettingFromLan()
+        public class Account
         {
-            RegistryKey registry =
-                Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\Connections",
-                    true);
-            var defaultValue = registry.GetValue("DefaultConnectionSettings");
-            try
-            {
-                var connections = registry.GetValueNames();
-                foreach (String each in connections)
-                {
-                    if (!(each.Equals("DefaultConnectionSettings")
-                        || each.Equals("LAN Connection")
-                        || each.Equals("SavedLegacySettings")))
-                    {
-                        //set all the connections's proxy as the lan
-                        registry.SetValue(each, defaultValue);
-                    }
-                }
-                NotifyIE();
-                //Must Notify IE first, or the connections do not chanage
+            public string BASE32 { get; set; }
+            public string obfsproxyadd { get; set; }
+            public string obfsproxyport { get; set; }
+            public string Localserver { get; set; }
+            public string Localport { get; set; }
 
-            }
-            catch (System.IO.IOException e)
-            {
-                MessageBox.Show(e.Message.ToString(), "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+
+            //  public IList<string> Roles { get; set; }
+        }
+
+        public class squidjson
+        {
+
+            public string Squidserveradd { get; set; }
+            public string Squidport { get; set; }
+
+            //  public IList<string> Roles { get; set; }
         }
 
 
-        public static void NotifyIE()
-        {
-            // These lines implement the Interface in the beginning of program 
-            // They cause the OS to refresh the settings, causing IP to realy update
-            _settingsReturn = InternetSetOption(IntPtr.Zero, INTERNET_OPTION_SETTINGS_CHANGED, IntPtr.Zero, 0);
-            _refreshReturn = InternetSetOption(IntPtr.Zero, INTERNET_OPTION_REFRESH, IntPtr.Zero, 0);
-        }
 
-        private static void IEAutoDetectProxy(bool set)
+
+
+        public string GetAllTime(int time)
         {
-            RegistryKey registry =
-                Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\Connections",
-                    true);
-            byte[] defConnection = (byte[])registry.GetValue("DefaultConnectionSettings");
-            byte[] savedLegacySetting = (byte[])registry.GetValue("SavedLegacySettings");
-            if (set)
+            string hh, mm, ss, fff;
+
+            int f = time % 100; // 毫秒   
+            int s = time / 100; // 转化为秒
+            int m = s / 60;     // 分
+            int h = m / 60;     // 时
+            s = s % 60;     // 秒 
+
+            //毫秒格式00
+            if (f < 10)
             {
-                defConnection[8] = Convert.ToByte(defConnection[8] & 8);
-                savedLegacySetting[8] = Convert.ToByte(savedLegacySetting[8] & 8);
+                fff = "0" + f.ToString();
             }
             else
             {
-                defConnection[8] = Convert.ToByte(defConnection[8] & ~8);
-                savedLegacySetting[8] = Convert.ToByte(savedLegacySetting[8] & ~8);
+                fff = f.ToString();
             }
-            registry.SetValue("DefaultConnectionSettings", defConnection);
-            registry.SetValue("SavedLegacySettings", savedLegacySetting);
+
+            //秒格式00
+            if (s < 10)
+            {
+                ss = "0" + s.ToString();
+            }
+            else
+            {
+                ss = s.ToString();
+            }
+
+            //分格式00
+            if (m < 10)
+            {
+                mm = "0" + m.ToString();
+            }
+            else
+            {
+                mm = m.ToString();
+            }
+
+            //时格式00
+            if (h < 10)
+            {
+                hh = "0" + h.ToString();
+            }
+            else
+            {
+                hh = h.ToString();
+            }
+
+            //返回 hh:mm:ss.ff            
+            //    return hh + ":" + mm + ":" + ss + "." + fff;
+
+            return hh + ":" + mm + ":" + ss;
         }
 
+      
+     
 
-        private void CancelProxySetting()
-        {
 
-            try
-            {
-                RegistryKey registry =
-                    Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings",
-                        true);
-
-                registry.SetValue("ProxyEnable", 0);
-                registry.SetValue("ProxyServer", "");
-                registry.SetValue("AutoConfigURL", "");
-
-                //Set AutoDetectProxy Off
-                IEAutoDetectProxy(false);
-                NotifyIE();
-                //Must Notify IE first, or the connections do not chanage
-                CopyProxySettingFromLan();
-            }
-            catch (Exception e)
-            {
-
-                // TODO this should be moved into views
-                MessageBox.Show("Failed to update registry");
-            }
-        }
 
         private void Killobfsproxy()
         {
@@ -268,49 +293,552 @@ namespace obfsproxy
             return output;
         }
 
-
-        private void Form1_Load(object sender, EventArgs e)
+        public static System.Net.Sockets.TcpClient Connect(System.Net.IPEndPoint remoteEndPoint, int timeoutMSec)
         {
-            textBox1.Text = "SBSB4444FANGBINXING4SBSBSBSBSBSB";
-            textBox5.Text = "1010";
-            textBox3.Text = "127.0.0.1";
-            textBox4.Text = "127.0.0.1";
-            textBox2.Text = "22222";
+            TimeoutObject.Reset();
+            socketexception = null;
+
+            string serverip = Convert.ToString(remoteEndPoint.Address);
+            int serverport = remoteEndPoint.Port;
+            System.Net.Sockets.TcpClient tcpclient = new System.Net.Sockets.TcpClient();
+
+            tcpclient.BeginConnect(serverip, serverport,
+                new AsyncCallback(CallBackMethod), tcpclient);
+
+            if (TimeoutObject.WaitOne(timeoutMSec, false))
+            {
+                if (IsConnectionSuccessful)
+                {
+                    return tcpclient;
+                }
+                else
+                {
+                    throw socketexception;
+                }
+            }
+            else
+            {
+                tcpclient.Close();
+                throw new TimeoutException("TimeOut Exception");
+            }
         }
 
-        private void button3_Click(object sender, EventArgs e)
+        private static void CallBackMethod(IAsyncResult asyncresult)
         {
-         
+            try
+            {
+                IsConnectionSuccessful = false;
+                TcpClient tcpclient = asyncresult.AsyncState as TcpClient;
+
+                if (tcpclient.Client != null)
+                {
+                    tcpclient.EndConnect(asyncresult);
+                    IsConnectionSuccessful = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                IsConnectionSuccessful = false;
+                socketexception = ex;
+            }
+            finally
+            {
+                TimeoutObject.Set();
+            }
         }
 
-        private void button2_Click(object sender, EventArgs e)
-        {
-          //  killfinaspeed();
-            Killobfsproxy();
-            CancelProxySetting();
-            //notifyIcon1.Icon = null;
-            //notifyIcon1.Dispose();
-            Application.DoEvents();
-            System.Environment.Exit(0);
-        }
 
-        private void button3_Click_1(object sender, EventArgs e)
-        {
-            CancelProxySetting();
-        }
+     
 
-        private void button1_Click(object sender, EventArgs e)
+
+        private void Savejson()
+
         {
 
 
 
             string path = System.Environment.CurrentDirectory;
-            string vbsname = path + "\\" + "obfsproxy.exe" + " scramblesuit --password=" + textBox1.Text + " --dest=" + textBox3.Text + ":" + textBox5.Text + " client " + textBox4.Text + ":" + textBox2.Text;
-          //  MessageBox.Show(vbsname);
-            Execute(vbsname, 1000);
 
-            AdslSetSquidProxy(textBox4.Text, textBox2.Text);
+
+            //IniWriteValue("obfsServer", "BASE32", textBox1.Text);
+            //IniWriteValue("obfsServer", "Port", textBox5.Text);
+            //IniWriteValue("obfsServer", "Address", textBox3.Text);
+
+
+
+            //List<data> _data = new List<data>();
+            //_data.Add(new data()
+            //{
+            //    BASE32 = textBox1.Text,
+            //    obfsproxyadd = textBox3.Text,
+            //    obfsproxyport = textBox5.Text
+
+            //}
+
+            //);
+
+
+
+            //string json = JsonConvert.SerializeObject(_data.ToArray());
+
+            ////write string to file
+            //System.IO.File.WriteAllText(@path + "\\" + "osconf1.json", json);
+
+
+            Account account = new Account
+            {
+                BASE32 = textBox1.Text,
+                obfsproxyadd = textBox3.Text,
+                obfsproxyport = textBox5.Text,
+                Localport = textBox2.Text,
+                Localserver = textBox4.Text,
+
+
+            };
+
+            string json = JsonConvert.SerializeObject(account, Newtonsoft.Json.Formatting.Indented);
+            // {
+            //   "Active": true,
+            //   "CreatedDate": "2013-01-20T00:00:00Z",
+            //   "Roles": [
+            //     "User",
+            //     "Admin"
+            //   ]
+            // }
+
+            System.IO.File.WriteAllText(@path + "\\" + "osconf.json", json);
+
+
+
+
 
         }
+
+        private void readjson()
+
+        {
+
+
+
+            string path = System.Environment.CurrentDirectory;
+            // read file into a string and deserialize JSON to a type
+
+
+            obfsproxyconfig movie1 = JsonConvert.DeserializeObject<obfsproxyconfig>(File.ReadAllText(@path + "\\" + "osconf.json"));
+
+
+            // deserialize JSON directly from a file
+            using (StreamReader file = File.OpenText(@path + "\\" + "osconf.json"))
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                obfsproxyconfig movie2 = (obfsproxyconfig)serializer.Deserialize(file, typeof(obfsproxyconfig));
+
+                _Base32 = movie2.BASE32;
+                _obfsproxyadd = movie2.obfsproxyadd;
+                _obfsproxyport = movie2.obfsproxyport;
+                _Localserver = movie2.Localserver;
+                _Localport = movie2.Localport;
+
+
+
+            }
+
+
+        }
+
+
+      private  void LatestVersionDL()
+        {
+            //Shadowsocks.updateApp fetchapp = new Shadowsocks.updateApp();
+
+            //fetchapp.Checkweb();
+
+            //fetchapp.CheckUpdate();
+
+            string latestversion = obfsproxy.updateApp.AppdlADD;
+
+            Process.Start(latestversion);
+
+        }
+
+   
+
+        private void readconf()
+
+        {
+
+            obfsproxy.readconf obfsproxy = new obfsproxy.readconf();
+
+
+            obfsproxy.readjson();
+
+            //  MessageBox.Show(obfsproxy._Localserver);
+
+
+            textBox4.Text = obfsproxy._Localserver;
+
+            //  textbox1.text = readconf._base32;
+            textBox2.Text = obfsproxy._Localport;
+            textBox1.Text = obfsproxy._Base32;
+            textBox3.Text = obfsproxy._obfsproxyadd;
+            textBox5.Text = obfsproxy._obfsproxyport;
+        }
+
+
+
+        private void updateVersion() {
+
+
+            obfsproxy.updateApp fetchapp = new obfsproxy.updateApp();
+
+            fetchapp.Checkweb();
+
+            fetchapp.CheckUpdate();
+
+
+            _contrastupdateStatus = updateApp.addMenu;
+
+            
+
+          versionNum = updateApp.Serverversion;
+
+           // MessageBox.Show("版本"+versionNum);
+
+
+            if (_contrastupdateStatus == 100)
+
+
+            {
+
+
+                StatusInfo.Text = "Obfsproxy mode : obfs4  版本升级提示:请升级到 V " + versionNum;
+
+                UpdateInfo.Text  = "有最新版"+versionNum;
+            }
+
+            if (_contrastupdateStatus != 100)
+
+
+
+            {
+
+          //      MessageBox.Show("test");
+
+               
+
+                StatusInfo.Text = "Obfsproxy mode : obfs4  版本:已经最新";
+            }
+
+
+        }
+
+        private void _checklocalport()
+
+        {
+            using (TcpClient tcpClient = new TcpClient())
+            {
+                try
+                {
+                    tcpClient.Connect("127.0.0.1", 7878);
+                    MessageBox.Show("雪豹端口7878已经被占用,请检查");
+
+                    Application.DoEvents();
+                    System.Environment.Exit(0);
+
+
+                }
+                catch (Exception)
+                {
+
+            
+                    //pictureBox1.Visible = false;
+                    this.ShowInTaskbar = false;
+
+                    obfsproxy.listen listen = new obfsproxy.listen();
+
+                    Thread _threadMain = new Thread(listen.DoWork);
+                    _threadMain.IsBackground = true;
+                    _threadList.Add(_threadMain);
+                    _threadMain.Start();
+
+
+                }
+            }
+
+        }
+
+
+
+        private void Form1_Load(object sender, EventArgs e)
+
+        {
+            //      this.SizeChanged += new System.EventHandler(this.Form1_SizeChanged);
+
+            // _checklocalport();
+
+
+            updateVersion();
+
+       
+            _checklocalport();
+
+         //   StatusInfo.Text= "Obfsproxy mode : obfs4";
+
+            textBox1.Visible = true;
+            timer1.Enabled = true;
+   
+
+             Killobfsproxy();
+
+           
+
+    
+            this.timer1.Enabled = false;
+            //textBox4.Enabled = false;
+            //textBox2.Enabled = false;
+
+            this.timer1.Interval = 2;
+
+            //   PublicServer.Checked = true;
+             obfs4.Checked = true;
+             smart.Checked = true;
+
+
+            label5.Text = "obfsproxy服务器端口";
+            label3.Text = "obfsproxy服务器地址";
+            label4.Text = "本地监听地址:";
+            label2.Text = "本地监听端口:";
+            textBox1.Visible = true;
+            textBox3.Visible = true;
+            textBox5.Visible = true;
+            label1.Visible = true;
+            label3.Visible = true;
+            label5.Visible = true;
+
+
+            readconf();
+
+
+            string path = System.Environment.CurrentDirectory;
+
+            string vbsname = path + "\\" + "obfsproxy.exe scramblesuit " + "--dest " + textBox3.Text + ":" + textBox5.Text + " --password " + textBox1.Text + " client " + textBox4.Text + ":" + textBox2.Text;
+          //  MessageBox.Show(vbsname);
+          
+            Execute(vbsname, 1000);
+
+
+
+
+        }
+
+
+
+
+
+        private void 退出ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Killobfsproxy();
+
+            obfsproxy.proxy proxy = new obfsproxy.proxy();
+
+            proxy.CancelProxySetting();
+
+            notifyIcon1.Icon = null;
+            notifyIcon1.Dispose();
+            //  MessageBox.Show("TEST");
+            Application.DoEvents();
+            System.Environment.Exit(0);
+        }
+
+
+  
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            Savejson();
+
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+            Savejson();
+        }
+
+        private void textBox5_TextChanged(object sender, EventArgs e)
+        {
+            Savejson();
+        }
+
+        private void textBox3_TextChanged(object sender, EventArgs e)
+        {
+            Savejson();
+        }
+
+        private void textBox4_TextChanged(object sender, EventArgs e)
+        {
+            Savejson();
+        }
+
+        private void textBox2_TextChanged(object sender, EventArgs e)
+        {
+            Savejson();
+        }
+
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            if (ms < 59)
+            {
+                ms++;
+            }
+            else if (s < 59)
+            {
+                ms = 00;
+                s++;
+            }
+            else if (m < 59)
+            {
+
+                s = 00;
+                m++;
+
+            }
+            else
+            {
+                m = -1;
+                h++;
+            }
+
+
+
+            //toolStripStatusLabel1.Text = "运行时间:  " + h.ToString() + "小时" + m.ToString() + "分" + s.ToString() + "秒";
+
+        }
+
+        private void label6_MouseClick(object sender, MouseEventArgs e)
+        {
+            System.Diagnostics.Process.Start(urlink);
+        }
+
+        private void groupBox5_Enter(object sender, EventArgs e)
+        {
+
+        }
+
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void toolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            this.Visible = true;
+            this.WindowState = FormWindowState.Normal;
+         //   this.notifyIcon1.Visible = false;
+
+        }
+
+        private void Form1_SizeChanged(object sender, EventArgs e)
+        {
+            if (this.WindowState == FormWindowState.Minimized)
+            {
+                this.Hide();
+                this.notifyIcon1.Visible = true;
+            }
+        }
+
+        private void 智能_Click(object sender, EventArgs e)
+        {
+
+          //  proxy.SetSquidProxy("http://127.0.0.1:8888");
+        }
+
+        private void smart_CheckStateChanged(object sender, EventArgs e)
+        {
+          
+        }
+
+   
+
+        private void notifyIcon1_DoubleClick(object sender, EventArgs e)
+        {
+            this.Visible = true;
+            this.WindowState = FormWindowState.Normal;
+        }
+
+        private void groupBox1_Enter(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start("http://127.0.0.1:7878/");
+        }
+
+        private void button2_Click_1(object sender, EventArgs e)
+        {
+
+     
+       
+        }
+
+        private void smart_Click(object sender, EventArgs e)
+        {
+            StatusInfo.Text = "Obfsproxy mode : obfs4 模式: 智能";
+
+
+
+            obfsproxy.proxy proxy = new obfsproxy.proxy();
+
+            proxy.SetSquidProxy("http://127.0.0.1:7878");
+
+
+            global.Checked = false;
+        }
+
+        private void global_Click(object sender, EventArgs e)
+        {
+            obfsproxy.proxy proxy = new obfsproxy.proxy();
+
+            StatusInfo.Text = "Obfsproxy mode : obfs4  模式: 全局";
+
+            proxy.AdslSetSquidProxy("127.0.0.1", "1012");
+
+
+            smart.Checked = false;
+        }
+
+      public  void UpdateInfo_Click(object sender, EventArgs e)
+        {
+
+            if (_contrastupdateStatus == 100)
+
+
+            {
+                LatestVersionDL();
+            }
+
+            if (_contrastupdateStatus != 100)
+
+
+            {
+                MessageBox.Show("当前版本" + versionNum);
+              //  UpdateInfo.Text = "有最新版" + versionNum;
+            }
+
+
+          
+
+        }
+
+        private void global_CheckedChanged(object sender, EventArgs e)
+        {
+          
+        }
+
+
+
+
     }
 }

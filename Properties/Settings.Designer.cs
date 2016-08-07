@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace obfsproxy1.Properties {
+namespace 风行者.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

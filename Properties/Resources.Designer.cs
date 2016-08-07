@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace obfsproxy1.Properties {
+namespace 风行者.Properties {
     using System;
     
     
@@ -22,7 +22,7 @@ namespace obfsproxy1.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,10 +36,10 @@ namespace obfsproxy1.Properties {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("obfsproxy1.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("风行者.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -51,12 +51,50 @@ namespace obfsproxy1.Properties {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to     var hasOwnProperty = Object.hasOwnProperty;
+        ///    var iproxy =&apos;DIRECT&apos;;
+        ///    var squidproxy =  &quot;PROXY ServerIP:1012;&quot;;
+        ///    var list = [
+        ///        [
+        ///        ],
+        ///        [
+        ///                [16777472, 4294967040],
+        ///                [16777728, 4294966784],
+        ///                [16779264, 4294965248],
+        ///                [16785408, 4294959104],
+        ///                [16842752, 4294967040],
+        ///                [16843264, 4294966784],
+        ///                [16843776, 4294966272],
+        ///                [16844800, 4294965248],
+        ///                [1684684 [rest of string was truncated]&quot;;.
+        /// </summary>
+        public static string hacker {
+            get {
+                return ResourceManager.GetString("hacker", resourceCulture);
+            }
+        }
+        
+
+        public static string myStringWebResource {
+            get {
+                return ResourceManager.GetString("myStringWebResource", resourceCulture);
+            }
+        }
+        
+
+        public static string xmlURL {
+            get {
+                return ResourceManager.GetString("xmlURL", resourceCulture);
             }
         }
     }

@@ -1,38 +1,21 @@
 
-## OneSafe 1.2##
+## OneSafe 1.7##
 
 
-* OneSafe [下载](https://github.com/squidproxy/obfs4/releases/download/v1.0.0.1/obfsproxydl.exe)
+* OneSafe [下载](https://github.com/squidproxy/obfs4/releases/)
 
 ##特性##
 
-- 核心套件obfsproxy
-- 多线程监视端口
-- 本地端口监听失败重启功能,确保稳定
-- 支持squid服务器添加启动
-- 可以解决finalspeed断流的问题,提高服务器流量传输的稳定性和安全
-- 基于Framework3.5框架开发
+- 客户端 支持obfs4 模式
 
+- 支持pac列表智能技术,可以绕过国内域名(最新加入特性)
 
-客户端功能介绍:
-OneSafe 既可以作为obfsproxy客户端使用,也可以配合SS、finalspeed、squidproxy等技术完成更安全的加密!
+- 支持全局,任意视频安全浏览
 
-##使用说明##
+-  专门针对部署了squid+obfs4 的服务器
 
-- BASE32  scramblesuit 是一种安全性稍高的加密工作方式, scramblesuit 通过自定义的 BASE32字符串混淆流量,因为BASE32 是用户可以自定义的
-这使得第三方很难模拟obfsproxy客户端!
+-  操作简单速度看1080P已无问题
 
-- 远程服务器端口 这个输入finalspeed客户端的本地端口或者填写你的obfsproxy服务器远程端口
-
-- 远程服务器地址 填写finalspeed本地监听地址比如:127.0.0.1,也可以填写你的obfsproxy服务器的IP地址
-
-- 可以自定义任何端口,在你启动obfsproxy的时候,客户端将设置IE的系统代理为该端口
-
-- 本地监听地址 一般默认为127.0.0.1,这个是obfsproxy客户端本地监听地址
-
-```
-注意事项: 右侧监听状态栏功能: 提供 finalspeed的本地端口或者obfsproxy的远程端口状态分析.如果obfsproxy启动成功，本地端口监听端口将
-显示监听成!如果监听失败,确保obfsproxy解压在一个英文路径的目录不留空格!中文会遇到问题!后续会解决这个bug!﻿
 
 ```
 ##使用说明##
@@ -45,12 +28,6 @@ obfsproxy is a tool that attempts to circumvent censorship, by transforming the 
 This way, censors, who usually monitor traffic between the client and the bridge,
  will see innocent-looking transformed traffic instead of the actual Tor traffic.
 
-
-##feature##
-
-- C# architecture
-- Base on Framework3.5
-- Support Smart and global Mode 
 
 
 ## Server
@@ -84,24 +61,21 @@ Add the following content to /etc/rc.local
 
 ```
 
-### 客户端使用说明###
+### 源码遵循协议###
 
-* 直接使用我们设计的OneSafe 客户端,他集成了设置和启动、代理等功能一体,让整个obfsproxy 更简单上手.
-* V1.2[下载](https://github.com/squidproxy/obfs4/releases/download/v1.0.0.1/obfsproxydl.exe)
+## License
 
-- BASE32  scramblesuit 是一种安全性稍高的加密工作方式, scramblesuit 通过自定义的 BASE32字符串混淆流量,因为BASE32 是用户可以自定义的
-这使得第三方很难模拟obfsproxy客户端!
+Copyright (C) 2016 Max Lv <max.c.lv@gmail.com>
 
-- 远程服务器端口 这个输入finalspeed客户端的本地端口或者填写你的obfsproxy服务器远程端口
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-- 远程服务器地址 填写finalspeed本地监听地址比如:127.0.0.1,也可以填写你的obfsproxy服务器的IP地址
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-- 可以自定义任何端口,在你启动obfsproxy的时候,客户端将设置IE的系统代理为该端口
-
-- 本地监听地址 一般默认为127.0.0.1,这个是obfsproxy客户端本地监听地址
-
-```
-注意事项: 右侧监听状态栏功能: 提供 finalspeed的本地端口或者obfsproxy的远程端口状态分析.如果obfsproxy启动成功，本地端口监听端口将
-显示监听成!如果监听失败,确保obfsproxy解压在一个英文路径的目录不留空格!中文会遇到问题!后续会解决这个bug!﻿
-
-```
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
